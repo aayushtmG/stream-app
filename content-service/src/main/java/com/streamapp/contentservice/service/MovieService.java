@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -42,22 +44,24 @@ public class MovieService {
    }
 
    public List<MovieResponse> getAllMovies(){
-       return null;
+       return movieRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
    }
 
    public List<MovieResponse> getMoviesByGenre(Genre genre){
-       List<MovieResponse> movieList = new ArrayList<MovieResponse>();
-       return  movieList;
+       return  movieRepository.findByGenre(genre).stream().map(this::mapToResponse).collect(Collectors.toList());
    }
 
     public MovieResponse getMovieById(
             String id
     ){
-        return new MovieResponse();
+       Movie movie = movieRepository.findById(id).orElseThrow(()-> new RuntimeException("Movie with id:" + id + " not found") );
+
+        return mapToResponse(movie);
     }
 
     public List<MovieResponse> searchMovies(String title) {
-        return null;
+        return movieRepository.findByTitleContainingIgnoreCase(title).stream().map(this::mapToResponse).collect(Collectors.toList());
+
     }
 
     //custom mapper
